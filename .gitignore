@@ -1,0 +1,19 @@
+# Node
+node_modules/
+dist/
+.vite/
+
+# Laravel
+/vendor/
+/.env
+/storage/*.key
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
