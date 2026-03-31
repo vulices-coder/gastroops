@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, onMounted, watch } from "vue"
 import FixedCostCreateForm from "@/modules/fixed-costs/components/FixedCostCreateForm.vue"
 import FixedCostsTable from "@/modules/fixed-costs/components/FixedCostsTable.vue"
 import { getFixedCosts, type FixedCost } from "@/api/fixedCosts"
+import { useUnitStore } from "@/stores/unit"
+
+const unitStore = useUnitStore()
 
 const costs = ref<FixedCost[]>([])
 const loading = ref(false)
@@ -22,7 +25,17 @@ async function load() {
   }
 }
 
-onMounted(load)
+onMounted(async () => {
+  unitStore.hydrate()
+  await load()
+})
+
+watch(
+  () => unitStore.activeUnitId,
+  async () => {
+    await load()
+  }
+)
 </script>
 
 <template>

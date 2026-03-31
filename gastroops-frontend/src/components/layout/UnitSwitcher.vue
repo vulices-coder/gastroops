@@ -1,31 +1,42 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
+import { ref, onMounted, watch } from "vue"
 import { getOperationalUnits, type OperationalUnit } from "@/api/units"
 import { useUnitStore } from "@/stores/unit"
 
-const units = ref<OperationalUnit[]>([])
 const unitStore = useUnitStore()
-
-async function loadUnits() {
-  units.value = await getOperationalUnits()
-}
+const units = ref<OperationalUnit[]>([])
 
 onMounted(async () => {
   unitStore.hydrate()
-  await loadUnits()
+  units.value = await getOperationalUnits()
 })
+
+watch(
+  () => unitStore.activeUnitId,
+  (value) => {
+    console.log("ACTIVE UNIT ID:", value)
+    unitStore.persist()
+  }
+)
 </script>
 
 <template>
-  <div class="flex items-center gap-3">
-    <label class="text-sm text-slate-500">Unit</label>
+  <div class="flex items-center gap-2">
+    <label for="unit-switcher" class="text-sm text-slate-500">Unit</label>
 
     <select
-      :value="unitStore.activeUnitId ?? ''"
-      class="rounded-lg border px-3 py-2 text-sm"
-      @change="unitStore.setUnit(($event.target as HTMLSelectElement).value ? Number(($event.target as HTMLSelectElement).value) : null)"
+      id="unit-switcher"
+      :value="unitStore.activeUnitId === null ? 'all' : String(unitStore.activeUnitId)"
+      class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
+      @change="
+        unitStore.setActiveUnitId(
+          ($event.target as HTMLSelectElement).value === 'all'
+            ? null
+            : Number(($event.target as HTMLSelectElement).value)
+        )
+      "
     >
-      <option value="">All units</option>
+      <option value="all">All units</option>
 
       <option
         v-for="unit in units"

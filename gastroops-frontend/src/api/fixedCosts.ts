@@ -3,11 +3,10 @@ import { useUnitStore } from "@/stores/unit"
 
 export interface FixedCost {
   id: number
-  operational_unit_id: number
   name: string
   amount: number
   currency: string
-  category?: string
+  category?: string | null
   period: string
   active: boolean
 }

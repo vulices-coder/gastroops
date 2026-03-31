@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue"
 import ExecutiveSummaryCard from "@/components/dashboard/ExecutiveSummaryCard.vue"
+import UnitsOverviewTable from "@/components/dashboard/UnitsOverviewTable.vue"
 import { getFixedCostsSummary } from "@/api/fixedCosts"
 import { getEmployeesSummary } from "@/api/employees"
 import { getAssetsSummary } from "@/api/assets"
@@ -9,6 +10,7 @@ import { getChannelsSummary } from "@/api/channels"
 import { getUtilityBillsSummary } from "@/api/utilities"
 import { getLicensesSummary } from "@/api/licenses"
 import { getCampaignsSummary } from "@/api/campaigns"
+import { getOperationalUnits, type OperationalUnit } from "@/api/units"
 import { useUnitStore } from "@/stores/unit"
 
 const unitStore = useUnitStore()
@@ -31,6 +33,8 @@ const licensesExpiringSoon = ref(0)
 const activeCampaigns = ref(0)
 const totalMarketingBudget = ref(0)
 
+const units = ref<OperationalUnit[]>([])
+
 const loading = ref(false)
 const error = ref("")
 
@@ -43,25 +47,60 @@ const totalOperationalMonthly = computed(() => {
   )
 })
 
+const totalUnits = computed(() => units.value.length)
+const activeUnits = computed(() => units.value.filter((unit) => unit.active).length)
+const inactiveUnits = computed(() => units.value.filter((unit) => !unit.active).length)
+
 function eur(value: number) {
   return `€ ${value.toFixed(2)}`
 }
 
-async function load() {
-  if (unitStore.activeUnitId === null) return
+function resetDashboard() {
+  monthlyFixed.value = 0
+  yearlyFixed.value = 0
+  monthlyLabor.value = 0
+  employeeCount.value = 0
+  activeAssets.value = 0
+  totalAssetValue.value = 0
+  cashIn.value = 0
+  cashOut.value = 0
+  netCashflow.value = 0
+  activeChannels.value = 0
+  monthlyChannelFees.value = 0
+  monthlyUtilities.value = 0
+  utilityBillsCount.value = 0
+  activeLicenses.value = 0
+  licensesExpiringSoon.value = 0
+  activeCampaigns.value = 0
+  totalMarketingBudget.value = 0
+}
 
+async function load() {
   loading.value = true
   error.value = ""
 
   try {
-    const fixed = await getFixedCostsSummary()
-    const labor = await getEmployeesSummary()
-    const assets = await getAssetsSummary()
-    const cash = await getCashFlowSummary()
-    const channels = await getChannelsSummary()
-    const utilities = await getUtilityBillsSummary()
-    const licenses = await getLicensesSummary()
-    const campaigns = await getCampaignsSummary()
+    const [
+      fixed,
+      labor,
+      assets,
+      cash,
+      channels,
+      utilities,
+      licenses,
+      campaigns,
+      operationalUnits,
+    ] = await Promise.all([
+      getFixedCostsSummary(),
+      getEmployeesSummary(),
+      getAssetsSummary(),
+      getCashFlowSummary(),
+      getChannelsSummary(),
+      getUtilityBillsSummary(),
+      getLicensesSummary(),
+      getCampaignsSummary(),
+      getOperationalUnits(),
+    ])
 
     monthlyFixed.value = fixed.monthly_total
     yearlyFixed.value = fixed.yearly_total
@@ -80,9 +119,12 @@ async function load() {
     licensesExpiringSoon.value = licenses.licenses_expiring_soon
     activeCampaigns.value = campaigns.active_campaigns
     totalMarketingBudget.value = campaigns.total_marketing_budget
+    units.value = operationalUnits
   } catch (err: any) {
     console.error("Dashboard summary error:", err)
     error.value = "Could not load dashboard summary."
+    resetDashboard()
+    units.value = []
   } finally {
     loading.value = false
   }
@@ -109,19 +151,15 @@ watch(
       </h1>
 
       <p class="text-slate-600">
-        Operational and financial overview for the selected business unit.
+        Operational and financial overview for
+        <span class="font-medium text-slate-800">
+          {{ unitStore.activeUnitId === null ? "all units" : "the selected business unit" }}
+        </span>.
       </p>
     </div>
 
     <div
-      v-if="unitStore.activeUnitId === null"
-      class="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-amber-700"
-    >
-      Select an operational unit in the topbar to see filtered dashboard data.
-    </div>
-
-    <div
-      v-else-if="loading"
+      v-if="loading"
       class="rounded-2xl bg-white p-6 shadow-sm"
     >
       Loading dashboard...
@@ -160,6 +198,28 @@ watch(
           subtitle="Operational equipment in use"
         />
       </div>
+
+      <div class="grid gap-6 md:grid-cols-3">
+        <ExecutiveSummaryCard
+          title="Total Units"
+          :value="totalUnits"
+          subtitle="All operational units"
+        />
+
+        <ExecutiveSummaryCard
+          title="Active Units"
+          :value="activeUnits"
+          subtitle="Currently operating"
+        />
+
+        <ExecutiveSummaryCard
+          title="Inactive Units"
+          :value="inactiveUnits"
+          subtitle="Not currently operating"
+        />
+      </div>
+
+      <UnitsOverviewTable :units="units" />
 
       <div class="space-y-3">
         <h2 class="text-xl font-semibold text-slate-900">

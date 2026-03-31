@@ -1,25 +1,35 @@
 import { defineStore } from "pinia"
+import { ref } from "vue"
 
-export const useUnitStore = defineStore("unit", {
-  state: () => ({
-    activeUnitId: null as number | null,
-  }),
+export const useUnitStore = defineStore("unit", () => {
+  const activeUnitId = ref<number | null>(null)
 
-  actions: {
-    setUnit(id: number | null) {
-      this.activeUnitId = id
+  function setActiveUnitId(id: number | null) {
+    activeUnitId.value = id
+  }
 
-      if (id === null) {
-        localStorage.removeItem("gastroops_active_unit_id")
-        return
-      }
+  function hydrate() {
+    const saved = localStorage.getItem("activeUnitId")
 
-      localStorage.setItem("gastroops_active_unit_id", String(id))
-    },
+    if (saved === null || saved === "all") {
+      activeUnitId.value = null
+      return
+    }
 
-    hydrate() {
-      const raw = localStorage.getItem("gastroops_active_unit_id")
-      this.activeUnitId = raw ? Number(raw) : null
-    },
-  },
+    activeUnitId.value = Number(saved)
+  }
+
+  function persist() {
+    localStorage.setItem(
+      "activeUnitId",
+      activeUnitId.value === null ? "all" : String(activeUnitId.value)
+    )
+  }
+
+  return {
+    activeUnitId,
+    setActiveUnitId,
+    hydrate,
+    persist,
+  }
 })
