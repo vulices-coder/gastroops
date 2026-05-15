@@ -12,6 +12,10 @@ use App\Http\Controllers\Api\V1\LicenseController;
 use App\Http\Controllers\Api\V1\CampaignController;
 
 Route::prefix('v1')->group(function () {
+    Route::options('/{any}', function () {
+        return response()->noContent();
+    })->where('any', '.*');
+
     Route::get('/operational-units', [OperationalUnitController::class, 'index']);
     Route::post('/operational-units', [OperationalUnitController::class, 'store']);
     Route::put('/operational-units/{operationalUnit}', [OperationalUnitController::class, 'update']);
