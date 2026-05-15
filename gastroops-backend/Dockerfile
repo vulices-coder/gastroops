@@ -17,4 +17,4 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
 
 EXPOSE 10000
 
-CMD php artisan optimize:clear && php artisan migrate --force && php artisan route:list && php artisan serve --host=0.0.0.0 --port=${PORT}
+CMD mkdir -p database && touch database/database.sqlite && php artisan optimize:clear && php artisan migrate --force && php artisan route:list && php artisan serve --host=0.0.0.0 --port=${PORT}
