@@ -123,4 +123,27 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+        'cors' => [
+        'paths' => ['api/*'],
+
+        'allowed_methods' => ['*'],
+
+        'allowed_origins' => [
+            'https://gastroops.vercel.app',
+            'https://gastroops-65dg.vercel.app',
+        ],
+
+        'allowed_origins_patterns' => [
+            '/^https:\/\/gastroops-65dg.*\.vercel\.app$/',
+        ],
+
+        'allowed_headers' => ['*'],
+
+        'exposed_headers' => [],
+
+        'max_age' => 0,
+
+        'supports_credentials' => false,
+    ],
+
 ];
