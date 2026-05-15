@@ -51,8 +51,13 @@ const totalUnits = computed(() => units.value.length)
 const activeUnits = computed(() => units.value.filter((unit) => unit.active).length)
 const inactiveUnits = computed(() => units.value.filter((unit) => !unit.active).length)
 
-function eur(value: number) {
-  return `€ ${value.toFixed(2)}`
+function toNumber(value: number | string | null | undefined) {
+  const parsed = Number(value ?? 0)
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+function eur(value: number | string | null | undefined) {
+  return `€ ${toNumber(value).toFixed(2)}`
 }
 
 function resetDashboard() {
@@ -102,24 +107,32 @@ async function load() {
       getOperationalUnits(),
     ])
 
-    monthlyFixed.value = fixed.monthly_total
-    yearlyFixed.value = fixed.yearly_total
-    monthlyLabor.value = labor.monthly_labor_cost
-    employeeCount.value = labor.employee_count
-    activeAssets.value = assets.active_assets
-    totalAssetValue.value = assets.total_asset_value
-    cashIn.value = cash.cash_in
-    cashOut.value = cash.cash_out
-    netCashflow.value = cash.net_cashflow
-    activeChannels.value = channels.active_channels
-    monthlyChannelFees.value = channels.monthly_channel_fees
-    monthlyUtilities.value = utilities.monthly_utilities
-    utilityBillsCount.value = utilities.utility_bills_count
-    activeLicenses.value = licenses.active_licenses
-    licensesExpiringSoon.value = licenses.licenses_expiring_soon
-    activeCampaigns.value = campaigns.active_campaigns
-    totalMarketingBudget.value = campaigns.total_marketing_budget
-    units.value = operationalUnits
+    monthlyFixed.value = toNumber(fixed?.monthly_total)
+    yearlyFixed.value = toNumber(fixed?.yearly_total)
+
+    monthlyLabor.value = toNumber(labor?.monthly_labor_cost)
+    employeeCount.value = toNumber(labor?.employee_count)
+
+    activeAssets.value = toNumber(assets?.active_assets)
+    totalAssetValue.value = toNumber(assets?.total_asset_value)
+
+    cashIn.value = toNumber(cash?.cash_in)
+    cashOut.value = toNumber(cash?.cash_out)
+    netCashflow.value = toNumber(cash?.net_cashflow)
+
+    activeChannels.value = toNumber(channels?.active_channels)
+    monthlyChannelFees.value = toNumber(channels?.monthly_channel_fees)
+
+    monthlyUtilities.value = toNumber(utilities?.monthly_utilities)
+    utilityBillsCount.value = toNumber(utilities?.utility_bills_count)
+
+    activeLicenses.value = toNumber(licenses?.active_licenses)
+    licensesExpiringSoon.value = toNumber(licenses?.licenses_expiring_soon)
+
+    activeCampaigns.value = toNumber(campaigns?.active_campaigns)
+    totalMarketingBudget.value = toNumber(campaigns?.total_marketing_budget)
+
+    units.value = Array.isArray(operationalUnits) ? operationalUnits : []
   } catch (err: any) {
     console.error("Dashboard summary error:", err)
     error.value = "Could not load dashboard summary."
