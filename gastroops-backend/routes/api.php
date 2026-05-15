@@ -11,6 +11,10 @@ use App\Http\Controllers\Api\V1\UtilityBillController;
 use App\Http\Controllers\Api\V1\LicenseController;
 use App\Http\Controllers\Api\V1\CampaignController;
 
+Route::options('/{any}', function () {
+    return response()->json([], 204);
+})->where('any', '.*');
+
 Route::prefix('v1')->group(function () {
     Route::options('/{any}', function () {
         return response()->noContent();
