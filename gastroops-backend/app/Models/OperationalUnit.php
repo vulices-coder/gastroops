@@ -12,4 +12,8 @@ class OperationalUnit extends Model
         'city',
         'active',
     ];
+
+    protected $casts = [
+        'active' => 'boolean',
+    ];
 }
