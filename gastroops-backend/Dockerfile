@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-WORFROM php:8.2-cli
+FROM php:8.2-cli
 
 RUN apt-get update && apt-get install -y \
     git unzip zip \
