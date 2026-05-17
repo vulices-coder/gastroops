@@ -59,7 +59,7 @@ async function submit() {
       Select an operational unit in the topbar before creating licenses.
     </div>
 
-    <form class="grid gap-4 md:grid-cols-2" @submit.prevent="submit">
+    <form class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       <input v-model="form.name" placeholder="License name" class="rounded-lg border px-3 py-2" />
       <input v-model="form.authority" placeholder="Authority" class="rounded-lg border px-3 py-2" />
       <input v-model="form.issue_date" type="date" class="rounded-lg border px-3 py-2" />

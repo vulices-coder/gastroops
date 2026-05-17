@@ -51,8 +51,8 @@ async function remove(id: number) {
 </script>
 
 <template>
-  <div class="overflow-hidden rounded-2xl border bg-white shadow-sm">
-    <table class="min-w-full text-left">
+  <div class="w-full overflow-x-auto rounded-2xl border bg-white shadow-sm">
+  <table class="min-w-[1100px] text-left">
       <thead class="bg-slate-50">
         <tr>
           <th class="px-4 py-3 text-sm font-semibold text-slate-600">Name</th>

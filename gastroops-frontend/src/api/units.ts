@@ -18,9 +18,12 @@ export async function createOperationalUnit(payload: any) {
   return data
 }
 
-export async function updateOperationalUnit(id: number, payload: any) {
-  const { data } = await api.put(`/operational-units/${id}`, payload)
-  return data
+export async function updateOperationalUnit(
+  id: number,
+  payload: Partial<OperationalUnit>
+) {
+  const response = await api.put(`/operational-units/${id}`, payload)
+  return response.data
 }
 
 export async function deleteOperationalUnit(id: number) {

@@ -28,11 +28,11 @@ watch(
   (unit) => {
     if (!unit) return
 
-    form.id = unit.id
+    form.id = Number(unit.id)
     form.name = unit.name
     form.unit_type = unit.unit_type
     form.city = unit.city || ""
-    form.active = unit.active
+    form.active = Boolean(Number(unit.active))
   },
   { immediate: true }
 )
@@ -46,7 +46,7 @@ async function handleSubmit() {
       name: form.name,
       unit_type: form.unit_type,
       city: form.city,
-      active: form.active,
+      active: Boolean(form.active),
     })
 
     emit("updated")

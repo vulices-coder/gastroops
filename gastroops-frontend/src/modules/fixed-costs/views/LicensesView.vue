@@ -59,7 +59,9 @@ watch(
     </div>
 
     <template v-else>
-      <LicenseCreateForm @created="load" />
+      <div class="w-full max-w-full overflow-hidden">
+        <LicenseCreateForm @created="load" />
+      </div>
 
       <div
         v-if="loading"
@@ -75,11 +77,15 @@ watch(
         {{ error }}
       </div>
 
-      <LicensesTable
+      <div
         v-else
-        :licenses="licenses"
-        @reload="load"
-      />
+        class="w-full max-w-full overflow-x-auto"
+      >
+        <LicensesTable
+          :licenses="licenses"
+          @reload="load"
+        />
+      </div>
     </template>
   </section>
 </template>
